@@ -2,6 +2,12 @@
 
 namespace Devswert\Dolly\SOAP;
 
+use SoapClient;
+use DOMDocument;
+
+require_once(__DIR__.'/../libs/xmlseclibs.php');
+require_once(__DIR__.'/../libs/soap-wsse.php');
+
 class WSSecuritySoapClient extends SoapClient{
     private $useSSL = false;
     private $privateKey = "";

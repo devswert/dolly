@@ -12,6 +12,9 @@ class DollyServiceProvider extends ServiceProvider{
      * @return void
      */
     public function boot(){
+        $this->publishes([
+            __DIR__.'/../config/dolly.php' => config_path('config.php'),
+        ], 'config');
     }
 
     /**

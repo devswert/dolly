@@ -80,7 +80,7 @@ class WebPayNormal{
             $inputs->finalURL = $url_final;
 
             $details = new \Devswert\Dolly\SOAP\Responses\Normal\wsTransactionDetail();
-            $details->commerceCode = $this->config->getCommerceCode();
+            $details->commerceCode = config('dolly.commerce_code');
             $details->buyOrder = $buy_order;
             $details->amount = $amount;
             $inputs->transactionDetails = $details;
