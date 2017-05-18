@@ -1,6 +1,6 @@
 <?php
 
-namespace Devswert\Dolly\WebPayServicies\WebPayNormal;
+namespace Devswert\Dolly\WebPayServicies;
 
 use Devswert\Dolly\Exceptions\WebPayConnectionException;
 use Devswert\Dolly\SOAP\SoapValidation;
