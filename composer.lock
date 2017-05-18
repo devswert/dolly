@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e17c6a5b0b0034148f268c666e16b007",
-    "content-hash": "9747d052858ee7f2e15642ba622ffccc",
+    "hash": "2d6292c98d6f7c8828061e3f915db4fb",
+    "content-hash": "dcdc1807b5adfcdb4ea3eeb1d7457356",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -220,91 +220,6 @@
                 "random"
             ],
             "time": "2017-03-13 16:27:32"
-        },
-        {
-            "name": "robrichards/wse-php",
-            "version": "2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/robrichards/wse-php.git",
-                "reference": "5dde350ec77930f2ff6c1bb15c4d9e257b1d2496"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/robrichards/wse-php/zipball/5dde350ec77930f2ff6c1bb15c4d9e257b1d2496",
-                "reference": "5dde350ec77930f2ff6c1bb15c4d9e257b1d2496",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 5.3",
-                "robrichards/xmlseclibs": "^2.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "RobRichards\\WsePhp\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Rob Richards",
-                    "homepage": "http://www.cdatazone.org/",
-                    "role": "Main developer"
-                }
-            ],
-            "description": "Libraries for adding WS-* support to ext/soap in PHP.",
-            "homepage": "https://github.com/robrichards/wse-php",
-            "keywords": [
-                "WS-Security",
-                "soap",
-                "ws-addressing"
-            ],
-            "time": "2017-03-09 16:42:34"
-        },
-        {
-            "name": "robrichards/xmlseclibs",
-            "version": "2.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/robrichards/xmlseclibs.git",
-                "reference": "53bb1e9cae490a8f93af41bd9df6ea897161ca05"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/robrichards/xmlseclibs/zipball/53bb1e9cae490a8f93af41bd9df6ea897161ca05",
-                "reference": "53bb1e9cae490a8f93af41bd9df6ea897161ca05",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">= 5.3"
-            },
-            "suggest": {
-                "ext/mcrypt": "MCrypt extension",
-                "ext/openssl": "OpenSSL extension"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "RobRichards\\XMLSecLibs\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "A PHP library for XML Security",
-            "homepage": "https://github.com/robrichards/xmlseclibs",
-            "keywords": [
-                "security",
-                "signature",
-                "xml",
-                "xmldsig"
-            ],
-            "time": "2016-09-08 13:15:00"
         }
     ],
     "packages-dev": [
