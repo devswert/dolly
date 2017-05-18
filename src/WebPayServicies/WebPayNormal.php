@@ -1,6 +1,6 @@
 <?php
 
-namespace Devswert\Dolly\WebPayServicies\WebPayNormal;
+namespace Devswert\Dolly\WebPayServicies;
 
 use Devswert\Dolly\Exceptions\WebPayConnectionException;
 use Devswert\Dolly\SOAP\SoapValidation;
@@ -52,7 +52,7 @@ class WebPayNormal{
     	\Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransaction::class,
     	\Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransactionResponse::class,
     	\Devswert\Dolly\SOAP\Responses\Normal\initTransaction::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionInput::class,
+    	'wsInitTransactionInput' => \Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionInput::class,
     	\Devswert\Dolly\SOAP\Responses\Normal\wpmDetailInput::class,
     	\Devswert\Dolly\SOAP\Responses\Normal\initTransactionResponse::class,
     	\Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionOutput::class
@@ -62,7 +62,7 @@ class WebPayNormal{
     	$private_key = config('dolly.private_key');
     	$public_cert = config('dolly.public_cert');
     	$endpoint = config('dolly.wsdl_urls.'. config('dolly.environment') );
-
+dd( new WSSecuritySoapClient() );
     	$this->soap_client = new WSSecuritySoapClient($endpoint, $private_key, $public_cert, [
     	    "classmap" => $this->classmap,
     	    "trace" => true,
@@ -94,7 +94,7 @@ class WebPayNormal{
         }
         catch(\Exception $e){
             $replaceArray = array('<!--' => '', '-->' => '');
-            $message = "Error conectando a Webpay ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage());
+            $message = "Error conectando a Webpay ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage()).' en '.$e->getFile().' línea '.$e->getLine();
             throw new WebPayConnectionException($message, 1);
         }
 

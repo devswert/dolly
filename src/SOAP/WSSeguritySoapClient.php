@@ -2,16 +2,17 @@
 
 namespace Devswert\Dolly\SOAP;
 
-use SoapClient;
 use DOMDocument;
-
-require_once(__DIR__.'/../libs/xmlseclibs.php');
-require_once(__DIR__.'/../libs/soap-wsse.php');
+use SoapClient;
+use RobRichards\WsePhp\WSSESoap;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class WSSecuritySoapClient extends SoapClient{
     private $useSSL = false;
     private $privateKey = "";
     private $publicCert = "";
+
+    use XMLSecTrait;
 
     function __construct($wsdl, $privateKey, $publicCert, $options) {
         $locationparts = parse_url($wsdl);
