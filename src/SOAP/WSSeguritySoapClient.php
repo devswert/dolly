@@ -4,22 +4,18 @@ namespace Devswert\Dolly\SOAP;
 
 use DOMDocument;
 use SoapClient;
-use RobRichards\WsePhp\WSSESoap;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class WSSecuritySoapClient extends SoapClient{
     private $useSSL = false;
     private $privateKey = "";
     private $publicCert = "";
 
-    use XMLSecTrait;
-
     function __construct($wsdl, $privateKey, $publicCert, $options) {
         $locationparts = parse_url($wsdl);
         $this->useSSL = $locationparts['scheme'] == "https" ? true : false;
         $this->privateKey = $privateKey;
         $this->publicCert = $publicCert;
-
+        
         return parent::__construct($wsdl, $options);
     }
 

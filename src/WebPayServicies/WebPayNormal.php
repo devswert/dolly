@@ -5,6 +5,7 @@ namespace Devswert\Dolly\WebPayServicies;
 use Devswert\Dolly\Exceptions\WebPayConnectionException;
 use Devswert\Dolly\SOAP\SoapValidation;
 use Devswert\Dolly\SOAP\WSSecuritySoapClient;
+use Devswert\Dolly\WebPayResultSummary;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,38 +32,27 @@ use Devswert\Dolly\SOAP\WSSecuritySoapClient;
 class WebPayNormal{
 
 	private $soap_client;
-    private $results_codes = [
-        '0' => 'Transacción aprobada',
-        '-1' => 'Rechazo de transacción',
-        '-2' => 'Transacción debe reintentarse',
-        '-3' => 'Error en transacción',
-        '-4' => 'Rechazo de transacción',
-        '-5' => 'Rechazo por error de tasa',
-        '-6' => 'Excede cupo máximo mensual',
-        '-7' => 'Excede límite diario por transacción',
-        '-8' => 'Rubro no autorizado',
-    ];
     private $classmap = [
-    	\Devswert\Dolly\SOAP\Responses\Common\getTransactionResult::class,
-    	\Devswert\Dolly\SOAP\Responses\Common\getTransactionResultResponse::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\transactionResultOutput::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\cardDetail::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\wsTransactionDetailOutput::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\wsTransactionDetail::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransaction::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransactionResponse::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\initTransaction::class,
+    	'getTransactionResult' => \Devswert\Dolly\SOAP\Responses\Common\getTransactionResult::class,
+    	'getTransactionResultResponse' => \Devswert\Dolly\SOAP\Responses\Common\getTransactionResultResponse::class,
+    	'transactionResultOutput' => \Devswert\Dolly\SOAP\Responses\Normal\transactionResultOutput::class,
+    	'cardDetail' => \Devswert\Dolly\SOAP\Responses\Normal\cardDetail::class,
+    	'wsTransactionDetailOutput' => \Devswert\Dolly\SOAP\Responses\Normal\wsTransactionDetailOutput::class,
+    	'wsTransactionDetail' => \Devswert\Dolly\SOAP\Responses\Normal\wsTransactionDetail::class,
+    	'acknowledgeTransaction' => \Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransaction::class,
+    	'acknowledgeTransactionResponse' => \Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransactionResponse::class,
+    	'initTransaction' => \Devswert\Dolly\SOAP\Responses\Normal\initTransaction::class,
     	'wsInitTransactionInput' => \Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionInput::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\wpmDetailInput::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\initTransactionResponse::class,
-    	\Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionOutput::class
+    	'wpmDetailInput' => \Devswert\Dolly\SOAP\Responses\Normal\wpmDetailInput::class,
+    	'initTransactionResponse' => \Devswert\Dolly\SOAP\Responses\Normal\initTransactionResponse::class,
+    	'wsInitTransactionOutput' => \Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionOutput::class
     ];
 
     public function __construct(){
     	$private_key = config('dolly.private_key');
     	$public_cert = config('dolly.public_cert');
     	$endpoint = config('dolly.wsdl_urls.'. config('dolly.environment') );
-dd( new WSSecuritySoapClient() );
+        
     	$this->soap_client = new WSSecuritySoapClient($endpoint, $private_key, $public_cert, [
     	    "classmap" => $this->classmap,
     	    "trace" => true,
@@ -85,7 +75,7 @@ dd( new WSSecuritySoapClient() );
             $details->amount = $amount;
             $inputs->transactionDetails = $details;
 
-            $response = $this->soap_client->initTransaction($inputs);
+            $response = $this->soap_client->initTransaction(['wsInitTransactionInput' => $inputs]);
 
             /** Validación de firma del requerimiento de respuesta enviado por Webpay */
             $xmlResponse = $this->soap_client->__getLastResponse();
@@ -94,7 +84,7 @@ dd( new WSSecuritySoapClient() );
         }
         catch(\Exception $e){
             $replaceArray = array('<!--' => '', '-->' => '');
-            $message = "Error conectando a Webpay ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage()).' en '.$e->getFile().' línea '.$e->getLine();
+            $message = "Error conectando a Webpay: ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage()).' en '.$e->getFile().' línea '.$e->getLine();
             throw new WebPayConnectionException($message, 1);
         }
 
@@ -112,30 +102,23 @@ dd( new WSSecuritySoapClient() );
             $getTransactionResultResponse = $this->soap_client->getTransactionResult($getTransactionResult);
 
             /** Validación de firma del requerimiento de respuesta enviado por Webpay */
-            $xmlResponse = $this->soapClient->__getLastResponse();
-            $soapValidation = new SoapValidation($xmlResponse, $this->config->getWebpayCert());
+            $xmlResponse = $this->soap_client->__getLastResponse();
+            $soapValidation = new SoapValidation($xmlResponse, config('dolly.webpay_cert'));
             $validationResult = $soapValidation->getValidationResult();
         }
         catch(\Exception $e){
             $replaceArray = array('<!--' => '', '-->' => '');
-            $message = "Error conectando a Webpay ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage());
+            $message = "Error conectando a Webpay: ".str_replace(array_keys($replaceArray), array_values($replaceArray), $e->getMessage()).' en '.$e->getFile().' línea '.$e->getLine();
             throw new WebPayConnectionException($message, 1);
         }
 
         if ($validationResult === TRUE){
-            $transactionResultOutput = $getTransactionResultResponse->return;
+            $transaction_result = $getTransactionResultResponse->return;
 
-            /** Indica a Webpay que se ha recibido conforme el resultado de la transacción */
-            if ($this->acknowledgeTransaction($token)) {
-                /** Validación de transacción aprobada */
-                $resultCode = $transactionResultOutput->detailOutput->responseCode;
-                if (($transactionResultOutput->VCI == "TSY" || $transactionResultOutput->VCI == "") && $resultCode == 0) {
-                    return $transactionResultOutput;
-                } else {
-                    $transactionResultOutput->detailOutput->responseDescription = $this->results_codes[$resultCode];
-                    return $transactionResultOutput;
-                }
-            }
+            // Informar a WebPay recepción de la transaccion y 
+            // retornamos un Response para trabajar
+            if ($this->acknowledgeTransaction($token))
+                return new WebPayResultSummary($transaction_result);
             else
                 throw new WebPayValidationException("Error validando conexión a Webpay (Verificar que la información del certificado sea correcta)", 1);
         }

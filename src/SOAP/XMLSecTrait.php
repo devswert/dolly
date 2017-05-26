@@ -8,7 +8,7 @@ use DOMDocument;
 use Exception;
 
 trait XMLSecTrait{
-	function sortAndAddAttrs($element, $arAtts) {
+	public function sortAndAddAttrs($element, $arAtts) {
 	    $newAtts = array();
 	    foreach ($arAtts AS $attnode) {
 	        $newAtts[$attnode->nodeName] = $attnode;
@@ -19,7 +19,7 @@ trait XMLSecTrait{
 	    }
 	}
 
-	function canonical($tree, $element, $withcomments) {
+	public function canonical($tree, $element, $withcomments) {
 	    if ($tree->nodeType != XML_DOCUMENT_NODE) {
 	        $dom = $tree->ownerDocument;
 	    } else {
@@ -28,7 +28,7 @@ trait XMLSecTrait{
 	    if ($element->nodeType != XML_ELEMENT_NODE) {
 	        if ($element->nodeType == XML_DOCUMENT_NODE) {
 	            foreach ($element->childNodes AS $node) {
-	                canonical($dom, $node, $withcomments);
+	                $this->canonical($dom, $node, $withcomments);
 	            }
 	            return;
 	        }
@@ -100,7 +100,7 @@ trait XMLSecTrait{
 	    }
 
 	    foreach ($element->childNodes AS $node) {
-	        canonical($elCopy, $node, $withcomments);
+	        $this->canonical($elCopy, $node, $withcomments);
 	    }
 	}
 
@@ -110,7 +110,7 @@ trait XMLSecTrait{
 	 * Modification by Hermann Alexander Arriagada Méndez
 	 * for IssuerSerial
 	 */
-	function getIssuerName($X509Cert) {
+	public function getIssuerName($X509Cert) {
 	    /* $handler = fopen($X509Cert, "r");
 	      $cert = fread($handler, 8192);
 	      fclose($handler); */
@@ -128,7 +128,7 @@ trait XMLSecTrait{
 	 * Modification by Hermann Alexander Arriagada Méndez
 	 * for IssuerSerial
 	 */
-	function getSerialNumber($X509Cert) {
+	public function getSerialNumber($X509Cert) {
 	    /* $handler = fopen($X509Cert, "r");
 	      $cert = fread($handler, 8192);
 	      fclose($handler); */
@@ -143,7 +143,7 @@ trait XMLSecTrait{
 	  $exclusive - boolean to indicate exclusive canonicalization (must pass TRUE)
 	  $withcomments - boolean indicating wether or not to include comments in canonicalized form
 	 */
-	function C14NGeneral($element, $exclusive = FALSE, $withcomments = FALSE) {
+	public function C14NGeneral($element, $exclusive = FALSE, $withcomments = FALSE) {
 	    /* IF PHP 5.2+ then use built in canonical functionality */
 	    $php_version = explode('.', PHP_VERSION);
 	    if (($php_version[0] > 5) || ($php_version[0] == 5 && $php_version[1] >= 2)) {
@@ -160,7 +160,7 @@ trait XMLSecTrait{
 	    }
 
 	    $copyDoc = new DOMDocument();
-	    canonical($copyDoc, $element, $withcomments);
+	    $this->canonical($copyDoc, $element, $withcomments);
 	    return $copyDoc->saveXML($copyDoc->documentElement, LIBXML_NOEMPTYTAG);
 	}
 }
