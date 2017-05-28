@@ -1,18 +1,7 @@
 # Changelog
 
-## NEXT - YYYY-MM-DD
+All notable changes to `devswert/dolly` will be documented in this file
 
-### Added
-- Nothing
+## 0.1.0 - 2017-05-27
 
-### Deprecated
-- Nothing
-
-### Fixed
-- Nothing
-
-### Removed
-- Nothing
-
-### Security
-- Nothing
+- Initial release with support to do only normal transactions

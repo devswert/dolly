@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateWebpayLogsTable extends Migration{
+
+    /**
+     * Run the migrations.
+     */
+    public function up(){
+        Schema::create('webpay_logs', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('accounting_date')->nullable();
+            $table->string('buy_order')->nullable();
+            $table->string('card_number')->nullable();
+            $table->string('card_expiration_date')->nullable();
+            $table->string('authorization_code')->nullable();
+            $table->string('payment_type')->nullable();
+            $table->string('payment_type_code')->nullable();
+            $table->string('result_code')->nullable();
+            $table->string('result_description')->nullable();
+            $table->string('shares_number')->nullable();
+            $table->string('amount')->nullable();
+            $table->string('commerce_code')->nullable();
+            $table->string('session_id')->nullable();
+            $table->string('transaction_date')->nullable();
+            $table->string('VCI')->nullable();
+            $table->string('VCI_name')->nullable();
+            $table->boolean('status')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(){
+        Schema::dropIfExists('webpay_logs');
+    }
+}

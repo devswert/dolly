@@ -1,11 +1,9 @@
 <?php
 
-namespace Devswert\Dolly\WebPayServicies;
+namespace Devswert\Dolly\WebPayServices;
 
 use Devswert\Dolly\Exceptions\WebPayConnectionException;
 use Devswert\Dolly\SOAP\SoapValidation;
-use Devswert\Dolly\SOAP\WSSecuritySoapClient;
-use Devswert\Dolly\WebPayResultSummary;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,17 +17,9 @@ use Devswert\Dolly\WebPayResultSummary;
 | datos de la tarjeta de crédito o débito lo realiza en forma segura 
 | en Webpay.
 |
-| Respuestas WebPay: 
-| TSY: Autenticación exitosa
-| TSN: autenticación fallida.
-| TO : Tiempo máximo excedido para autenticación.
-| ABO: Autenticación abortada por tarjetahabiente.
-| U3 : Error interno en la autenticación.
-| Puede ser vacío si la transacción no se autentico.
-|
 */
 
-class WebPayNormal{
+class WebPayNormal extends WebPayBase{
 
 	private $soap_client;
     private $classmap = [
@@ -49,18 +39,10 @@ class WebPayNormal{
     ];
 
     public function __construct(){
-    	$private_key = config('dolly.private_key');
-    	$public_cert = config('dolly.public_cert');
-    	$endpoint = config('dolly.wsdl_urls.'. config('dolly.environment') );
-        
-    	$this->soap_client = new WSSecuritySoapClient($endpoint, $private_key, $public_cert, [
-    	    "classmap" => $this->classmap,
-    	    "trace" => true,
-    	    "exceptions" => true
-    	]);
+    	$this->soap_client = parent::__construct($this->classmap);
     }
 
-    public function initTransaction($amount, $buy_order, $session_id , $url_return, $url_final){
+    public function start($amount, $buy_order, $session_id , $url_return, $url_final){
         try{
             $inputs = new \Devswert\Dolly\SOAP\Responses\Normal\wsInitTransactionInput();
             $inputs->wSTransactionType = "TR_NORMAL_WS";
@@ -79,7 +61,7 @@ class WebPayNormal{
 
             /** Validación de firma del requerimiento de respuesta enviado por Webpay */
             $xmlResponse = $this->soap_client->__getLastResponse();
-            $soapValidation = new SoapValidation($xmlResponse, config('dolly.webpay_cert'));
+            $soapValidation = new SoapValidation($xmlResponse, $this->webpayCert());
             $validationResult = $soapValidation->getValidationResult();
         }
         catch(\Exception $e){
@@ -95,7 +77,7 @@ class WebPayNormal{
             throw new WebPayValidationException("Error validando conexión a Webpay (Verificar que la información del certificado sea correcta)", 1);
     }
 
-    public function getTransactionResult($token){
+    public function result($token){
         try{
             $getTransactionResult = new \Devswert\Dolly\SOAP\Responses\Common\getTransactionResult();
             $getTransactionResult->tokenInput = $token;
@@ -103,7 +85,7 @@ class WebPayNormal{
 
             /** Validación de firma del requerimiento de respuesta enviado por Webpay */
             $xmlResponse = $this->soap_client->__getLastResponse();
-            $soapValidation = new SoapValidation($xmlResponse, config('dolly.webpay_cert'));
+            $soapValidation = new SoapValidation($xmlResponse, $this->webpayCert());
             $validationResult = $soapValidation->getValidationResult();
         }
         catch(\Exception $e){
@@ -115,22 +97,22 @@ class WebPayNormal{
         if ($validationResult === TRUE){
             $transaction_result = $getTransactionResultResponse->return;
 
-            // Informar a WebPay recepción de la transaccion y 
-            // retornamos un Response para trabajar
-            if ($this->acknowledgeTransaction($token))
+            // Informar a WebPay recepción de la transaccion y retornamos un Response para trabajar
+            if ($this->acknowledgeTransaction($token)){
                 return new WebPayResultSummary($transaction_result);
+            }
             else
                 throw new WebPayValidationException("Error validando conexión a Webpay (Verificar que la información del certificado sea correcta)", 1);
         }
     }
 
-    public function acknowledgeTransaction($token) {
+    protected function acknowledgeTransaction($token) {
         $acknowledgeTransaction = new \Devswert\Dolly\SOAP\Responses\Normal\acknowledgeTransaction();
         $acknowledgeTransaction->tokenInput = $token;
         $this->soap_client->acknowledgeTransaction($acknowledgeTransaction);
         
         $xmlResponse = $this->soap_client->__getLastResponse();
-        $soapValidation = new SoapValidation($xmlResponse, config('dolly.webpay_cert'));
+        $soapValidation = new SoapValidation($xmlResponse, $this->webpayCert());
         $validationResult = $soapValidation->getValidationResult();
         return $validationResult === TRUE;
     }
