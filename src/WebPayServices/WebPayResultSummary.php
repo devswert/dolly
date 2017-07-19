@@ -1,6 +1,6 @@
 <?php
 
-namespace Devswert\Dolly;
+namespace Devswert\Dolly\WebPayServices;
 
 use Devswert\Dolly\Model\WebPayLog;
 

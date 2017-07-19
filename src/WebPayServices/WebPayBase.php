@@ -27,7 +27,7 @@ abstract class WebPayBase{
             throw new InvalidConfigException('Debes indicar un código de comercio válido para WebPay', 1);
 
         if( !in_array(config('dolly.environment'), ['integration','certification','production']) )
-            throw new InvalidConfigException('Los entornos de WebPay solo pueden ser integration,certification o production', 1);
+            throw new InvalidConfigException('Los entornos de WebPay solo pueden ser integration, certification o production', 1);
 
         if( !file_exists(base_path().'/'.config('dolly.private_key')) )
             throw new InvalidConfigException('La llave privada de WebPay no existe', 1);
